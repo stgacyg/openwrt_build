@@ -134,7 +134,7 @@ jobs:
         cd openwrt
         echo -e "$(nproc) thread cpu"
         echo "Start Time: "$(date +"%Y/%m/%d %H:%M:%S")""
-        make image
+        make toolchain/install
         make package/luci-lib-docker/compile V=s
         make package/luci-app-dockerman/compile V=s
         echo "End Time: "$(date +"%Y/%m/%d %H:%M:%S")""
