@@ -9,7 +9,7 @@ on:
     inputs:
       resource_directory:
         description: '路由器资源目录'
-        default: 'open_app_filter'
+        default: 'passwall'
       repo_branch:
         type: choice
         description: '版本分支'
@@ -27,7 +27,7 @@ on:
       feeds_file:
         type: choice
         description: '替换软件源配置(feeds.conf.default)'
-        default: 'false'
+        default: 'true'
         options:
         - "true"
         - "false"
