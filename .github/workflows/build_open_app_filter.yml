@@ -123,6 +123,8 @@ jobs:
         cd openwrt
         echo -e "$(nproc) thread cpu"
         echo "Start Time: "$(date +"%Y/%m/%d %H:%M:%S")""
+        make tools/intall
+        make toolchain/install
         make package/luci-app-oaf/compile V=s
         echo "End Time: "$(date +"%Y/%m/%d %H:%M:%S")""
         echo  "status=success" >>$GITHUB_OUTPUT
