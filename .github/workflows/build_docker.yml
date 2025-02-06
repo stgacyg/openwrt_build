@@ -1,6 +1,3 @@
-####################################
-#  update for 2025/02/05 00:24:31  #
-####################################
 name: 编译固件_Docker
 
 on: 
@@ -34,13 +31,7 @@ on:
         options:
         - "true"
         - "false"
-      upload_release:
-        type: choice
-        description: '发布到release'
-        default: 'false'
-        options:
-        - "false"
-        - "true"
+
 env:
   TIMEZONE: Asia/Shanghai
   
@@ -54,7 +45,6 @@ env:
   CONFIG_FILE: '${{ github.event.inputs.resource_directory }}/${{ github.event.inputs.config_file }}'
   RUN_BEFORPATCH: ${{ github.event.inputs.befor_patch }}
   BEFOR_PATCH: '${{ github.event.inputs.resource_directory }}/make_befor.sh'
-  UPLOAD_RELEASE: ${{ github.event.inputs.upload_release }}
   
   
 jobs:
@@ -127,7 +117,6 @@ jobs:
         find dl -size -1024c -exec ls -l {} \;
         find dl -size -1024c -exec rm -f {} \;
         
-        
     - name: 编译固件
       id: makefirmware
       run: |
@@ -147,9 +136,9 @@ jobs:
       id: organize
       if: steps.makefirmware.outputs.status == 'success'
       run: |
-        cd openwrt/bin/targets/*/*
-        cp ../../../../.config ./build.config
-        cp ../../../../feeds.conf.default ./feeds.conf.default
+        cd openwrt/feeds/luci/applications
+        cp ../../../.config ./build.config
+        cp /../../../feeds.conf.default ./feeds.conf.default
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
         echo "status=success" >>$GITHUB_OUTPUT
         
@@ -165,32 +154,3 @@ jobs:
       with:
         retain_days: 1
         keep_minimum_runs: 5
-        
-    - name: 生成release标签
-      id: releasetag
-      if: env.UPLOAD_RELEASE == 'true' && steps.makefirmware.outputs.status == 'success' && !cancelled()
-      run: |
-        echo "release_tag=$(date +"%Y.%m.%d-%H%M")" >>$GITHUB_OUTPUT
-        touch release.txt
-        [ $UPLOAD_COWTRANSFER = true ] && echo "🔗 [Cowtransfer](${{ steps.cowtransfer.outputs.url }})" >> release.txt
-        [ $UPLOAD_WETRANSFER = true ] && echo "🔗 [WeTransfer](${{ steps.wetransfer.outputs.url }})" >> release.txt
-        echo "status=success" >>$GITHUB_OUTPUT
-        
-    - name: 上传固件到Release
-      uses: softprops/action-gh-release@v1
-      if: env.UPLOAD_RELEASE == 'true' && steps.releasetag.outputs.status == 'success' && !cancelled()
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ steps.releasetag.outputs.release_tag }}
-        body_path: release.txt
-        files: ${{ env.FIRMWARE }}/*
-        
-    - name: 清理Releases旧数据
-      uses: dev-drprasad/delete-older-releases@v0.1.0
-      if: env.UPLOAD_RELEASE == 'true' && !cancelled()
-      with:
-        keep_latest: 2
-        delete_tags: true
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
