@@ -34,7 +34,7 @@ on:
       befor_patch:
         type: choice
         description: '执行编译前脚本(make_befor.sh)'
-        default: 'true'
+        default: 'false'
         options:
         - "true"
         - "false"
