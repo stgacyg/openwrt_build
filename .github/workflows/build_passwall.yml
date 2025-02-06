@@ -138,7 +138,7 @@ jobs:
         cd openwrt
         echo -e "$(nproc) thread cpu"
         echo "Start Time: "$(date +"%Y/%m/%d %H:%M:%S")""
-        ake package/luci-app-passwall/compile V=s
+        make package/luci-app-passwall/compile V=s
         echo "End Time: "$(date +"%Y/%m/%d %H:%M:%S")""
         echo  "status=success" >>$GITHUB_OUTPUT
         grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
